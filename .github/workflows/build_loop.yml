@@ -232,7 +232,7 @@ jobs:
           mkdir -p buildlog artifacts
           xcodebuild archive \
             -workspace LoopWorkspace.xcworkspace \
-            -scheme Loop \
+            -scheme LoopWorkspace \
             -configuration Release \
             -destination 'generic/platform=iOS' \
             -archivePath build/Loop.xcarchive \
