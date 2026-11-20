@@ -227,15 +227,25 @@ jobs:
 
       # Build unsigned Loop IPA file (no signing, no certificates)
       - name: Build unsigned IPA
+        env:
+          TEAMID: ${{ secrets.TEAMID }}
         run: |
           set -o pipefail
           mkdir -p buildlog artifacts
+
+          # Loop derives its bundle id from com.$(TEAMID).loopkit.Loop and its
+          # App Group from group.$(TEAMID).loopkit.Loop. If TEAMID is empty the
+          # bundle id becomes com..loopkit.Loop and the app crashes at launch
+          # (Core Data fatalError). Fall back to a placeholder segment.
+          TEAMID_ARG="${TEAMID:-UNSIGNED00}"
+
           xcodebuild archive \
             -workspace LoopWorkspace.xcworkspace \
             -scheme LoopWorkspace \
             -configuration Release \
             -destination 'generic/platform=iOS' \
             -archivePath build/Loop.xcarchive \
+            TEAMID="$TEAMID_ARG" \
             CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO \
             2>&1 | tee buildlog/build.log
 
